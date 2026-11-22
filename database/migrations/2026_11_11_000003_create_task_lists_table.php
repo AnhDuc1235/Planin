@@ -13,10 +13,14 @@ return new class extends Migration
     {
         Schema::create('task_lists', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('workspace_id')->constrained('workspaces')->onDelete('cascade');
+            $table->foreignId('board_id')->constrained('boards')->onDelete('cascade');
             $table->string('name', 150);
-            $table->integer('position')->default(0); // Thứ tự cột (0, 1, 2...)
+            $table->integer('position')->default(0); // Thứ tự cột trong bảng (0, 1, 2...)
+            $table->timestamp('archived_at')->nullable();
             $table->timestamps();
+            $table->softDeletes();
+
+            $table->index(['board_id', 'position']);
         });
     }
 
@@ -28,4 +32,3 @@ return new class extends Migration
         Schema::dropIfExists('task_lists');
     }
 };
-

@@ -13,12 +13,15 @@ return new class extends Migration
     {
         Schema::create('workspaces', function (Blueprint $table) {
             $table->id();
+            // Chủ sở hữu workspace
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
             $table->string('name', 150);
             $table->text('description')->nullable();
             $table->string('color', 30)->default('#AA6ADA');
+            // Nhãn tiếng Việt: config/planin.php -> enums.workspace_visibility
             $table->enum('visibility', ['private', 'public'])->default('private');
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 
@@ -30,4 +33,3 @@ return new class extends Migration
         Schema::dropIfExists('workspaces');
     }
 };
-

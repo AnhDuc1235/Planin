@@ -14,11 +14,17 @@ return new class extends Migration
         Schema::create('activity_logs', function (Blueprint $table) {
             $table->id();
             $table->foreignId('workspace_id')->constrained('workspaces')->onDelete('cascade');
-            $table->foreignId('user_id')->nullable()->constrained('users')->onDelete('set null');
+            $table->foreignId('board_id')->nullable()->constrained('boards')->onDelete('cascade');
+            $table->foreignId('task_list_id')->nullable()->constrained('task_lists')->onDelete('set null');
             $table->foreignId('task_id')->nullable()->constrained('tasks')->onDelete('cascade');
-            $table->string('action', 50); // vd: created, updated, moved, completed
+            $table->foreignId('user_id')->nullable()->constrained('users')->onDelete('set null');
+            $table->string('action', 50); // vd: created, updated, moved, completed (nhãn: config/planin.php -> activity_actions)
             $table->string('description', 255)->nullable();
+            $table->json('properties')->nullable(); // Dữ liệu chi tiết: cột cũ/mới, giá trị cũ/mới...
             $table->timestamps();
+            $table->softDeletes();
+
+            $table->index(['board_id', 'created_at']);
         });
     }
 
@@ -30,4 +36,3 @@ return new class extends Migration
         Schema::dropIfExists('activity_logs');
     }
 };
-

@@ -95,7 +95,7 @@
 
           @foreach ($workspaces as $ws)
             <a
-              href="{{ route('board', ['workspace_id' => $ws->id]) }}"
+              href="{{ route('workspaces.index', ['workspace_id' => $ws->id]) }}"
               class="flex items-center space-x-2.5 px-3 py-2.5 hover:bg-purple-50 cursor-pointer transition text-sm {{ ($currentWorkspace && $currentWorkspace->id === $ws->id) ? 'bg-purple-50 text-[#AA6ADA] font-bold' : 'text-gray-700' }}"
             >
               <div class="w-6 h-6 rounded bg-[#AA6ADA] text-white flex items-center justify-center text-xs font-bold shrink-0">

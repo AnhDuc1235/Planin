@@ -17,10 +17,12 @@ return new class extends Migration
             $table->string('email')->unique();
             $table->string('password');
             $table->string('avatar')->nullable();
-            $table->string('role', 20)->default('member');
+            // Quyền toàn hệ thống (nhãn tiếng Việt: config/planin.php -> enums.user_role)
+            $table->enum('role', ['admin', 'member'])->default('member');
             $table->timestamp('email_verified_at')->nullable();
             $table->rememberToken();
             $table->timestamps();
+            $table->softDeletes();
         });
 
         Schema::create('password_reset_tokens', function (Blueprint $table) {

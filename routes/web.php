@@ -27,7 +27,7 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 // 3. Quản lý Workspace & Board (Áp dụng Middleware check.login)
 // Thuần Session & Form POST Laravel - KHÔNG DÙNG API
 Route::middleware('check.login')->group(function () {
-    Route::get('/board', [WorkspaceController::class, 'index'])->name('board');
+    Route::get('/board', [WorkspaceController::class, 'index'])->name('workspaces.index');
     Route::post('/workspaces', [WorkspaceController::class, 'storeWorkspace'])->name('workspaces.store');
     Route::post('/boards', [WorkspaceController::class, 'storeBoard'])->name('boards.store');
 });

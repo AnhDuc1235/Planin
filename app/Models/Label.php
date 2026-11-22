@@ -3,26 +3,29 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Label extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
 
+    protected $table = 'labels';
     protected $fillable = [
-        'workspace_id',
+        'board_id',
         'name',
         'color',
     ];
 
-    public function workspace()
+    public function board(): BelongsTo
     {
-        return $this->belongsTo(Workspace::class);
+        return $this->belongsTo(Board::class);
     }
 
-    public function tasks()
+    public function tasks(): BelongsToMany
     {
         return $this->belongsToMany(Task::class, 'task_labels')->withTimestamps();
     }
 }
-

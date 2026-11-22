@@ -22,7 +22,7 @@
             Giới thiệu
           </a>
           <a 
-            href="{{ route('board') }}"
+            href="{{ route('workspaces.index') }}"
             class="hover:text-[#AA6ADA] transition-colors font-medium text-sm text-[#172B4D] cursor-pointer"
           >
             Đi tới Board
@@ -48,7 +48,7 @@
           </a>
         @else
           <a 
-            href="{{ route('board') }}"
+            href="{{ route('workspaces.index') }}"
             class="px-4 py-2 text-sm font-medium text-white bg-[#AA6ADA] hover:bg-[#9252c4] rounded-md transition-colors cursor-pointer"
           >
             Vào Board
