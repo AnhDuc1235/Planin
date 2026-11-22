@@ -55,7 +55,7 @@ class WorkspaceController extends Controller
             'visibility' => 'public',
         ]);
 
-        return redirect()->route('board', ['workspace_id' => $workspace->id])
+        return redirect()->route('workspaces.index', ['workspace_id' => $workspace->id])
             ->with('success', 'Tạo Không gian làm việc thành công!');
     }
 
@@ -84,7 +84,7 @@ class WorkspaceController extends Controller
             'visibility' => $validated['visibility'] ?? 'workspace',
         ]);
 
-        return redirect()->route('board', ['workspace_id' => $workspace->id])
+        return redirect()->route('workspaces.index', ['workspace_id' => $workspace->id])
             ->with('success', 'Tạo bảng thành công!');
     }
 }

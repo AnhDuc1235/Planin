@@ -41,23 +41,17 @@
 
     <!-- Avatar người dùng & Menu dropdown đăng xuất -->
     <div class="relative">
-      @php
-        $initials = 'PL';
-        if (Auth::user() && Auth::user()->name) {
-            $words = preg_split('/\s+/u', trim(Auth::user()->name));
-            if (count($words) > 1) {
-                $initials = mb_substr($words[0], 0, 1, 'UTF-8') . mb_substr(end($words), 0, 1, 'UTF-8');
-            } else {
-                $initials = mb_substr(Auth::user()->name, 0, 2, 'UTF-8');
-            }
-        }
-      @endphp
       <button
         type="button"
         onclick="toggleElement('userMenuDropdown')"
-        class="w-9 h-9 rounded-full bg-[#AA6ADA] text-white text-sm font-bold flex items-center justify-center cursor-pointer uppercase hover:opacity-90 transition shadow-2xs"
+        class="w-9 h-9 rounded-full overflow-hidden bg-[#AA6ADA] text-white text-sm font-bold flex items-center justify-center cursor-pointer uppercase hover:opacity-90 transition shadow-2xs"
+        title="Tài khoản"
       >
-        {{ mb_strtoupper($initials, 'UTF-8') }}
+        @if (Auth::user()?->avatar_url)
+          <img src="{{ Auth::user()->avatar_url }}" alt="{{ Auth::user()->name }}" class="w-full h-full object-cover" />
+        @else
+          {{ Auth::user()?->initials ?? 'PL' }}
+        @endif
       </button>
 
       <!-- Dropdown tài khoản -->
@@ -69,6 +63,10 @@
           <p class="font-semibold text-gray-800 truncate">{{ Auth::user()->name ?? 'Thành viên' }}</p>
           <p class="text-gray-400 text-[11px] truncate">{{ Auth::user()->email ?? 'user@example.com' }}</p>
         </div>
+
+        <a href="{{ route('account.edit') }}" class="block px-3 py-2 text-gray-700 hover:bg-purple-50 hover:text-[#AA6ADA] transition cursor-pointer">
+          Hồ sơ cá nhân
+        </a>
 
         <a href="/" class="block px-3 py-2 text-gray-700 hover:bg-purple-50 hover:text-[#AA6ADA] transition cursor-pointer">
           Về Trang chủ

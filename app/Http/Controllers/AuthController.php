@@ -2,110 +2,90 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\User;
+use App\Http\Requests\ForgotPasswordRequest;
+use App\Http\Requests\LoginRequest;
+use App\Http\Requests\ResetPasswordRequest;
+use App\Services\AuthService;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Password;
+use Illuminate\View\View;
 
+/**
+ * Xác thực: đăng nhập, đăng xuất, quên / đặt lại mật khẩu.
+ * Controller chỉ nhận Request đã validate và gọi AuthService.
+ * Việc chặn người đã đăng nhập vào /login do middleware 'check.guest' đảm nhiệm.
+ */
 class AuthController extends Controller
 {
-    /**
-     * Hiển thị trang đăng nhập.
-     * Dùng session: nếu đã đăng nhập rồi -> chuyển thẳng về trang board.
-     */
-    public function showLoginForm()
+    public function __construct(private readonly AuthService $auth)
     {
-        if (Auth::check()) {
-            return redirect('/board');
-        }
+    }
 
+    public function showLoginForm(): View
+    {
         return view('auth.login');
     }
 
-    /**
-     * Hiển thị trang đăng ký.
-     * Dùng session: nếu đã đăng nhập rồi -> chuyển thẳng về trang board.
-     */
-    public function showRegisterForm()
+    public function login(LoginRequest $request): RedirectResponse
     {
-        if (Auth::check()) {
-            return redirect('/board');
+        $data = $request->validated();
+
+        $this->auth->attempt(
+            $data['email'],
+            $data['password'],
+            $request->boolean('remember'),
+            (string) $request->ip(),
+        );
+
+        // Quay lại URL đích đã bị CheckLogin chặn; không có thì vào trang làm việc.
+        return redirect()->intended(route('workspaces.index'));
+    }
+
+    public function logout(): RedirectResponse
+    {
+        $this->auth->logout();
+
+        return redirect()->route('home');
+    }
+
+    public function showForgotPasswordForm(): View
+    {
+        return view('auth.forgot-password');
+    }
+
+    public function sendResetLink(ForgotPasswordRequest $request): RedirectResponse
+    {
+        $status = $this->auth->sendResetLink($request->validated('email'));
+
+        if ($status === Password::RESET_THROTTLED) {
+            return back()
+                ->withInput($request->only('email'))
+                ->withErrors(['email' => __($status)]);
         }
 
-        return view('auth.register');
+        // Thông báo chung cho cả trường hợp email không tồn tại (tránh dò email).
+        return back()->with('status', 'Nếu email tồn tại trong hệ thống, chúng tôi đã gửi liên kết đặt lại mật khẩu.');
     }
 
-    /**
-     * Xử lý đăng nhập bằng form submit truyền thống (Dùng Session, KHÔNG dùng API).
-     */
-    public function login(Request $request)
+    public function showResetPasswordForm(Request $request, string $token): View
     {
-        $credentials = $request->validate([
-            'email' => 'required|email',
-            'password' => 'required|string',
-        ], [
-            'email.required' => 'Vui lòng nhập địa chỉ email.',
-            'email.email' => 'Địa chỉ email không đúng định dạng.',
-            'password.required' => 'Vui lòng nhập mật khẩu.',
+        return view('auth.reset-password', [
+            'token' => $token,
+            'email' => $request->query('email'),
         ]);
+    }
 
-        $remember = $request->boolean('remember');
+    public function resetPassword(ResetPasswordRequest $request): RedirectResponse
+    {
+        $status = $this->auth->resetPassword($request->validated());
 
-        // Xác thực qua session thuần Laravel
-        if (Auth::attempt($credentials, $remember)) {
-            $request->session()->regenerate();
-            return redirect('/board');
+        if ($status === Password::PASSWORD_RESET) {
+            return redirect()->route('login')->with('status', __($status));
         }
 
-        // Đăng nhập thất bại: trả lại form đăng nhập kèm thông báo lỗi qua session
-        return back()->withErrors([
-            'login_error' => 'Email hoặc mật khẩu không chính xác.',
-        ])->onlyInput('email');
-    }
-
-    /**
-     * Xử lý đăng ký bằng form submit truyền thống (Dùng Session, KHÔNG dùng API).
-     */
-    public function register(Request $request)
-    {
-        $validated = $request->validate([
-            'name' => 'required|string|max:100',
-            'email' => 'required|email|max:190|unique:users,email',
-            'password' => 'required|string|min:6',
-        ], [
-            'name.required' => 'Vui lòng nhập họ và tên.',
-            'email.required' => 'Vui lòng nhập email.',
-            'email.email' => 'Địa chỉ email không đúng định dạng.',
-            'email.unique' => 'Địa chỉ email này đã được sử dụng.',
-            'password.required' => 'Vui lòng nhập mật khẩu.',
-            'password.min' => 'Mật khẩu phải có ít nhất 6 ký tự.',
-        ]);
-
-        // Tạo tài khoản mới vào CSDL
-        $user = User::create([
-            'name' => $validated['name'],
-            'email' => $validated['email'],
-            'password' => Hash::make($validated['password']),
-            'role' => 'member',
-        ]);
-
-        // Đăng nhập ngay lập tức qua session
-        Auth::login($user);
-        $request->session()->regenerate();
-
-        return redirect('/board');
-    }
-
-    /**
-     * Xử lý đăng xuất (Dùng Session, KHÔNG dùng API).
-     */
-    public function logout(Request $request)
-    {
-        Auth::logout();
-
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
-
-        return redirect('/');
+        return back()
+            ->withInput($request->only('email'))
+            ->withErrors(['email' => __($status)]);
     }
 }

@@ -32,7 +32,11 @@
             <!-- Thông báo lỗi từ Session Laravel -->
             @if ($errors->any())
               <div class="mb-4 p-2.5 bg-red-50 border border-red-200 text-red-600 rounded-md text-xs font-normal">
-                {{ $errors->first() }}
+                <ul class="list-disc pl-4 space-y-0.5">
+                  @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                  @endforeach
+                </ul>
               </div>
             @endif
 
@@ -79,7 +83,25 @@
                   type="password" 
                   name="password"
                   required
-                  placeholder="Nhập mật khẩu (tối thiểu 6 ký tự)"
+                  placeholder="Nhập mật khẩu (tối thiểu 8 ký tự)"
+                  minlength="8"
+                  autocomplete="new-password"
+                  class="w-full px-3 py-2 text-sm rounded-md border border-gray-300 focus:outline-none focus:border-[#AA6ADA] bg-white transition"
+                />
+              </div>
+
+              <!-- Nhập lại mật khẩu -->
+              <div>
+                <label class="block text-xs font-semibold text-[#172B4D] mb-1">
+                  Nhập lại mật khẩu <span class="text-red-500">*</span>
+                </label>
+                <input 
+                  type="password" 
+                  name="password_confirmation"
+                  required
+                  minlength="8"
+                  autocomplete="new-password"
+                  placeholder="Nhập lại mật khẩu"
                   class="w-full px-3 py-2 text-sm rounded-md border border-gray-300 focus:outline-none focus:border-[#AA6ADA] bg-white transition"
                 />
               </div>

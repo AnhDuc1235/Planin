@@ -14,6 +14,7 @@ return Application::configure(basePath: dirname(__DIR__))
         // Khai báo alias middleware theo đúng kiến thức đã học
         $middleware->alias([
             'check.login' => \App\Http\Middleware\CheckLogin::class,
+            'check.guest' => \App\Http\Middleware\RedirectIfAuthenticated::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

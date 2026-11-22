@@ -69,6 +69,17 @@
                 />
               </div>
 
+              <!-- Ghi nhớ đăng nhập + Quên mật khẩu -->
+              <div class="flex items-center justify-between text-xs">
+                <label class="inline-flex items-center space-x-2 text-gray-600 cursor-pointer">
+                  <input type="checkbox" name="remember" value="1" @checked(old('remember')) class="rounded border-gray-300 accent-[#AA6ADA]" />
+                  <span>Ghi nhớ đăng nhập</span>
+                </label>
+                <a href="{{ route('password.request') }}" class="font-semibold text-[#AA6ADA] hover:underline cursor-pointer">
+                  Quên mật khẩu?
+                </a>
+              </div>
+
               <!-- Nút Đăng nhập màu tím chủ đạo #AA6ADA -->
               <button 
                 type="submit" 
