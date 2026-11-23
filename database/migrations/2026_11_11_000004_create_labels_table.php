@@ -13,10 +13,11 @@ return new class extends Migration
     {
         Schema::create('labels', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('workspace_id')->constrained('workspaces')->onDelete('cascade');
+            $table->foreignId('board_id')->constrained('boards')->onDelete('cascade'); // Nhãn theo bảng
             $table->string('name', 50);
             $table->string('color', 30)->default('#AA6ADA');
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 
@@ -28,4 +29,3 @@ return new class extends Migration
         Schema::dropIfExists('labels');
     }
 };
-

@@ -2,12 +2,19 @@
 
 namespace App\Models;
 
+use App\Support\PlaninEnum;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 
 class Workspace extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
 
     protected $fillable = [
         'user_id',
@@ -17,31 +24,42 @@ class Workspace extends Model
         'visibility',
     ];
 
-    public function owner()
+    protected function visibilityLabel(): Attribute
+    {
+        return Attribute::get(fn () => PlaninEnum::label('workspace_visibility', $this->visibility));
+    }
+
+    public function owner(): BelongsTo
     {
         return $this->belongsTo(User::class, 'user_id');
     }
 
-    public function members()
+    public function members(): BelongsToMany
     {
         return $this->belongsToMany(User::class, 'workspace_members')
             ->withPivot('role')
             ->withTimestamps();
     }
 
-    public function boards()
+    /** Các bảng đang hoạt động (chưa lưu trữ), mới nhất trước. */
+    public function boards(): HasMany
     {
-        return $this->hasMany(Board::class)->latest();
+        return $this->hasMany(Board::class)->whereNull('archived_at')->latest();
     }
 
-    public function taskLists()
+    public function archivedBoards(): HasMany
     {
-        return $this->hasMany(TaskList::class)->orderBy('position');
+        return $this->hasMany(Board::class)->whereNotNull('archived_at')->latest('archived_at');
     }
 
-    public function labels()
+    /** Nhãn thuộc các bảng của workspace (nhãn lưu theo bảng). */
+    public function labels(): HasManyThrough
     {
-        return $this->hasMany(Label::class);
+        return $this->hasManyThrough(Label::class, Board::class);
+    }
+
+    public function activityLogs(): HasMany
+    {
+        return $this->hasMany(ActivityLog::class);
     }
 }
-

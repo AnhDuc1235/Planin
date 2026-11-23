@@ -17,8 +17,9 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
             $table->string('file_name', 255);
             $table->string('file_path', 255);
-            $table->integer('file_size')->nullable(); // Dung lượng file tính bằng KB
+            $table->unsignedInteger('file_size')->nullable(); // Dung lượng file, đơn vị KB
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 
@@ -30,4 +31,3 @@ return new class extends Migration
         Schema::dropIfExists('attachments');
     }
 };
-

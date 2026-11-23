@@ -36,7 +36,7 @@
           </a>
 
           <a
-            href="{{ route('board') }}"
+            href="{{ route('workspaces.index') }}"
             class="text-sm font-semibold text-[#AA6ADA] hover:text-[#9252c4] py-3 transition-colors cursor-pointer"
           >
             Đi tới Board &rarr;

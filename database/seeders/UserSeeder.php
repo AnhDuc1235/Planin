@@ -4,35 +4,32 @@ namespace Database\Seeders;
 
 use App\Models\User;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\Hash;
 
 class UserSeeder extends Seeder
 {
     /**
-     * Run the database seeds.
+     * 1 quản trị viên + 10 người dùng thường (mật khẩu: config('planin.seed_password')).
      */
     public function run(): void
     {
-        // Tài khoản Quản trị viên mẫu
-        User::updateOrCreate(
-            ['email' => 'admin@example.com'],
-            [
-                'name' => 'Quản trị viên Hệ thống',
-                'password' => Hash::make('password123'),
-                'role' => 'admin',
-                'email_verified_at' => now(),
-            ]
-        );
+        $password = config('planin.seed_password', 'password123');
 
-        // Tài khoản Thành viên mẫu
-        User::updateOrCreate(
-            ['email' => 'member@example.com'],
-            [
-                'name' => 'Nguyễn Văn Thành Viên',
-                'password' => Hash::make('password123'),
-                'role' => 'member',
-                'email_verified_at' => now(),
-            ]
-        );
+        // 1 Quản trị viên
+        User::factory()->admin()->create([
+            'name' => 'Quản trị viên Hệ thống',
+            'email' => 'admin@example.com',
+            'password' => $password,
+        ]);
+
+        // 10 người dùng thường: 1 tài khoản cố định + 9 tài khoản ngẫu nhiên
+        User::factory()->create([
+            'name' => 'Nguyễn Văn Thành Viên',
+            'email' => 'member@example.com',
+            'password' => $password,
+        ]);
+
+        User::factory()->count(9)->create([
+            'password' => $password,
+        ]);
     }
 }
