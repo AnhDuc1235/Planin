@@ -31,3 +31,13 @@ Route::middleware('check.login')->group(function () {
     Route::post('/workspaces', [WorkspaceController::class, 'storeWorkspace'])->name('workspaces.store');
     Route::post('/boards', [WorkspaceController::class, 'storeBoard'])->name('boards.store');
 });
+
+// 4. Route thử hạ tầng - CHỈ môi trường local (kiểm tra layout/Vue/trang lỗi)
+if (app()->environment('local')) {
+    Route::middleware('check.login')->prefix('_dev')->group(function () {
+        Route::view('/vue-test', 'dev.vue-test')->name('dev.vue-test');
+        Route::get('/abort/{code}', fn (int $code) => abort($code))
+            ->whereIn('code', [403, 404, 419, 429, 500, 503])
+            ->name('dev.abort');
+    });
+}

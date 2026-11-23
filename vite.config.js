@@ -1,6 +1,7 @@
+import { fileURLToPath, URL } from 'node:url';
 import { defineConfig } from 'vite';
 import laravel from 'laravel-vite-plugin';
-import { bunny } from 'laravel-vite-plugin/fonts';
+// import { bunny } from 'laravel-vite-plugin/fonts';
 import tailwindcss from '@tailwindcss/vite';
 import vue from '@vitejs/plugin-vue';
 
@@ -9,12 +10,12 @@ export default defineConfig({
         laravel({
             input: ['resources/css/app.css', 'resources/js/app.js'],
             refresh: true,
-            fonts: [
-                bunny('Instrument Sans', {
-                    weights: [400, 500, 600],
-                    optimizedFallbacks: false,
-                }),
-            ],
+            // fonts: [
+            //     bunny('Instrument Sans', {
+            //         weights: [400, 500, 600],
+            //         optimizedFallbacks: false,
+            //     }),
+            // ],
         }),
         tailwindcss(),
         vue({
@@ -28,8 +29,8 @@ export default defineConfig({
     ],
     resolve: {
         alias: {
-            vue: 'vue/dist/vue.esm-bundler.js',
-            '@': '/resources/js',
+            // vue: 'vue/dist/vue.esm-bundler.js',
+            '@': fileURLToPath(new URL('./resources/js', import.meta.url)),
         },
     },
     server: {
