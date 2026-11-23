@@ -15,8 +15,10 @@ return new class extends Migration
             $table->id();
             $table->foreignId('workspace_id')->constrained('workspaces')->onDelete('cascade');
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
+            // Quyền trong workspace. Nhãn: config/planin.php -> enums.workspace_member_role
             $table->enum('role', ['admin', 'member', 'viewer'])->default('member');
             $table->timestamps();
+            $table->softDeletes();
 
             // Mỗi người chỉ tham gia 1 lần trong 1 workspace
             $table->unique(['workspace_id', 'user_id']);
@@ -31,4 +33,3 @@ return new class extends Migration
         Schema::dropIfExists('workspace_members');
     }
 };
-

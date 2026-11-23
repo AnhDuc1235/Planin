@@ -17,11 +17,18 @@ return new class extends Migration
             $table->foreignId('user_id')->nullable()->constrained('users')->onDelete('set null'); // Người tạo thẻ
             $table->string('title', 255);
             $table->text('description')->nullable();
+            // Nhãn tiếng Việt: config/planin.php -> enums.task_priority
             $table->enum('priority', ['low', 'medium', 'high', 'urgent'])->default('medium');
-            $table->enum('status', ['todo', 'in_progress', 'done'])->default('todo');
+            $table->dateTime('start_date')->nullable();
             $table->dateTime('due_date')->nullable();
-            $table->integer('position')->default(0); // Thứ tự của task trong cột
+            $table->timestamp('completed_at')->nullable(); // null = chưa hoàn thành
+            $table->string('cover', 255)->nullable();      // Ảnh bìa thẻ
+            $table->integer('position')->default(0);       // Thứ tự của thẻ trong cột
+            $table->timestamp('archived_at')->nullable();
             $table->timestamps();
+            $table->softDeletes();
+
+            $table->index(['task_list_id', 'position']);
         });
     }
 
@@ -33,4 +40,3 @@ return new class extends Migration
         Schema::dropIfExists('tasks');
     }
 };
-
